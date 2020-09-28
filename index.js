@@ -15,10 +15,13 @@ var job = new CronJob('0 11 * * *', function () {
     let feed = await parser.parseURL(config.RSS_FEED);
     const channel = client.channels.cache.find(channel => channel.name === config.CHANNEL_NAME)
     feed.items.forEach(item => {
-      if (item.title.includes(config.SEARCH_TERM)) {
-        if (format(new Date(parseISO(item.isoDate)), 'd') === format(new Date(), 'd')) {
-          channel.send(item.title + "\n" + item.link)
-        }
+      if (term.includes(',')) {
+        var terms = term.split(',');
+        terms.forEach(searchTerm => {
+          CompareTitleToSearchTerm(searchTerm, item, channel);
+        })
+      } else {
+        CompareTitleToSearchTerm(term, item, channel);
       }
     });
   })();
@@ -28,4 +31,10 @@ client.on('ready', () => {
   job.start();
 });
 
-
+function CompareTitleToSearchTerm(term, article, channel) {
+  if (article.title.includes(term)) {
+    if (format(new Date(parseISO(article.isoDate)), 'd') === format(new Date(), 'd')) {
+      channel.send(article.title + "\n" + article.link)
+    }
+  }
+}
