@@ -13,6 +13,7 @@ client.login(config.BOT_TOKEN);
 var job = new CronJob('0 11 * * *', function () {
   (async () => {
     let feed = await parser.parseURL(config.RSS_FEED);
+    let term = config.SEARCH_TERM;
     const channel = client.channels.cache.find(channel => channel.name === config.CHANNEL_NAME)
     feed.items.forEach(item => {
       if (term.includes(',')) {
