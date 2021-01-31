@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "tsc && node build/bot.js"
+    "start": "tsc && node build/init.js && node build/bot.js"
   },
   "repository": {
     "type": "git",
