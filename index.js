@@ -20,7 +20,7 @@ var job = new CronJob('0 12 * * *', function () {
 }, null, true, config.TIMEZONE);
 
 client.on('ready', () => {
-  job.start();
+  sendDiscordBotCOVIDStats();    
 });
 
 async function sendDiscordBotCOVIDStats(){
@@ -34,13 +34,17 @@ async function sendDiscordBotCOVIDStats(){
     title:"Daily COVID Number in Ontario for "+ dateExport,
     url:"https://covid19tracker.ca/"
   }).addFields(
-		{ name: 'New Cases', value: payload.change_cases },
-    { name: 'New Tests', value: payload.change_tests },
-    { name: 'Positivety Percentage', value: casePer },
-    { name: 'New Fatalities', value: payload.change_fatalities },
-    { name: 'New Hospitalizations', value: payload.change_hospitalizations },
-    { name: 'New Criticals', value: payload.change_criticals },
-    { name: 'New Recoveries', value: payload.change_recoveries }
+		{ name: 'New Cases', value: payload.change_cases , inline:  true },
+    { name: 'New Tests', value: payload.change_tests , inline:  true },
+    { name: 'Positivety Percentage', value: casePer , inline:  true },
+    { name: 'New Recoveries', value: payload.change_recoveries , inline:  true },
+    { name: 'New Fatalities', value: payload.change_fatalities , inline:  true },
+    { name: '\u200B', value: '\u200B' },
+    { name: 'New Hospitalizations', value: payload.change_hospitalizations, inline:  true  },
+    { name: 'Total Hospitalizations', value: payload.total_hospitalizations, inline:  true  },
+    { name: '\u200B', value: '\u200B' },
+    { name: 'New Criticals', value: payload.change_criticals ,inline:  true },
+    { name: 'Total Criticals', value: payload.total_criticals ,inline:  true }
 	);
   channel.send(message)
 }
