@@ -18,7 +18,9 @@
   },
   "homepage": "https://github.com/jaychu/covid-discord-bot#readme",
   "dependencies": {
+    "axios": "^0.21.1",
     "cron": "^1.8.2",
+    "date-and-time": "^2.0.0",
     "date-fns": "^2.16.1",
     "discord.js": "^12.3.1",
     "rss-parser": "^3.9.0"
