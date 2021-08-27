@@ -20,7 +20,7 @@ var job = new CronJob('0 12 * * *', function () {
 }, null, true, config.TIMEZONE);
 
 client.on('ready', () => {
-  sendDiscordBotCOVIDStats();    
+  job.start();
 });
 
 async function sendDiscordBotCOVIDStats(){
