@@ -19,7 +19,7 @@ var job = new CronJob('0 12 * * *', function () {
   })();
 }, null, true, config.TIMEZONE);
 
-client.on('ready', () => {
+client.on('ready', () => {  
   job.start();
 });
 
@@ -51,25 +51,41 @@ async function sendDiscordBotCOVIDStats(){
 
 
 async function sendDiscordBotArticle(){
+  const channel = client.channels.cache.find(channel => channel.name === config.CHANNEL_NAME)
+  const now = new Date();
+  let dateExport = date.format(now, 'YYYY-MM-DD');  
   let feed = await parser.parseURL(config.RSS_FEED);
   let term = config.SEARCH_TERM;
-  const channel = client.channels.cache.find(channel => channel.name === config.CHANNEL_NAME)
+  var message = new Discord.MessageEmbed({
+    title:"Articles related to COVID-19 for "+ dateExport,
+  })
   feed.items.forEach(item => {
     if (term.includes(',')) {
       var terms = term.split(',');
       terms.forEach(searchTerm => {
-        CompareTitleToSearchTerm(searchTerm, item, channel);
+        if(CompareTitleToSearchTerm(searchTerm, item)){
+          message.addFields({
+            name: item.title,
+            value:item.link
+          });
+        }
       })
     } else {
-      CompareTitleToSearchTerm(term, item, channel);
+      if(CompareTitleToSearchTerm(term, item)){
+        message.addFields({
+          name: item.title,
+          value:item.link
+        });
+      }
     }
   });
+  channel.send(message)
 }
 
-function CompareTitleToSearchTerm(term, article, channel) {
+function CompareTitleToSearchTerm(term, article) {
   if (article.title.includes(term)) {
     if (format(new Date(parseISO(article.isoDate)), 'd') === format(new Date(), 'd')) {
-      channel.send(article.title + "\n" + article.link)
+      return true;
     }
   }
 }
