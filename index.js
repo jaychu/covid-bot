@@ -42,7 +42,7 @@ async function sendDiscordBotCOVIDStats(){
     }, 600000);
   }else{
     console.log(dateExport+" first grab success");
-    channel.send(grabDataFromLoadedFeed(feed.data.data[0]));
+    channel.send(grabDataFromLoadedFeed(feed.data.data[0],dateExport));
   }
 }
 
@@ -87,7 +87,7 @@ function CompareTitleToSearchTerm(term, article) {
   }
 }
 
-function grabDataFromLoadedFeed(payload){
+function grabDataFromLoadedFeed(payload, dateExport){
   let casePer = ((payload.change_cases/payload.change_tests)*100).toFixed(2)+"%"
   var message = new Discord.MessageEmbed({
     title:"Daily COVID Number in Ontario for "+ dateExport,
