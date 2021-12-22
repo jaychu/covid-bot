@@ -27,26 +27,23 @@ async function sendDiscordBotCOVIDStats(){
   const channel = client.channels.cache.find(channel => channel.name === config.CHANNEL_NAME)
   const now = new Date();
   let dateExport = date.format(now, 'YYYY-MM-DD');  
-  let feed = await axios.get("https://api.covid19tracker.ca/reports/province/ON?date="+dateExport);
-  let payload = feed.data.data[0];
-  let casePer = ((payload.change_cases/payload.change_tests)*100).toFixed(2)+"%"
-  var message = new Discord.MessageEmbed({
-    title:"Daily COVID Number in Ontario for "+ dateExport,
-    url:"https://covid19tracker.ca/"
-  }).addFields(
-		{ name: 'New Cases', value: payload.change_cases , inline:  true },
-    { name: 'New Tests', value: payload.change_tests , inline:  true },
-    { name: 'Positivety Percentage', value: casePer , inline:  true },
-    { name: 'New Recoveries', value: payload.change_recoveries , inline:  true },
-    { name: 'New Fatalities', value: payload.change_fatalities , inline:  true },
-    { name: '\u200B', value: '\u200B' },
-    { name: 'New Hospitalizations', value: payload.change_hospitalizations, inline:  true  },
-    { name: 'Total Hospitalizations', value: payload.total_hospitalizations, inline:  true  },
-    { name: '\u200B', value: '\u200B' },
-    { name: 'New Criticals', value: payload.change_criticals ,inline:  true },
-    { name: 'Total Criticals', value: payload.total_criticals ,inline:  true }
-	);
-  channel.send(message)
+  let apiURL = "https://api.covid19tracker.ca/reports/province/ON?date="+dateExport;
+  let feed = await axios.get(apiURL);  
+
+  if(feed.data.data.length == 0){
+    console.log(dateExport+" first grab failed");
+    const intervalObj = setInterval(async () => {
+      console.log(dateExport+' interviewing the interval');  
+      let feed = await axios.get(apiURL);  
+      if(feed.data.data.length > 0){
+        channel.send(grabDataFromLoadedFeed(feed.data.data[0]));    
+        clearInterval(intervalObj);
+      }
+    }, 600000);
+  }else{
+    console.log(dateExport+" first grab success");
+    channel.send(grabDataFromLoadedFeed(feed.data.data[0]));
+  }
 }
 
 
@@ -88,4 +85,25 @@ function CompareTitleToSearchTerm(term, article) {
       return true;
     }
   }
+}
+
+function grabDataFromLoadedFeed(payload){
+  let casePer = ((payload.change_cases/payload.change_tests)*100).toFixed(2)+"%"
+  var message = new Discord.MessageEmbed({
+    title:"Daily COVID Number in Ontario for "+ dateExport,
+    url:"https://covid19tracker.ca/"
+  }).addFields(
+		{ name: 'New Cases', value: payload.change_cases , inline:  true },
+    { name: 'New Tests', value: payload.change_tests , inline:  true },
+    { name: 'Positivety Percentage', value: casePer , inline:  true },
+    { name: 'New Recoveries', value: payload.change_recoveries , inline:  true },
+    { name: 'New Fatalities', value: payload.change_fatalities , inline:  true },
+    { name: '\u200B', value: '\u200B' },
+    { name: 'New Hospitalizations', value: payload.change_hospitalizations, inline:  true  },
+    { name: 'Total Hospitalizations', value: payload.total_hospitalizations, inline:  true  },
+    { name: '\u200B', value: '\u200B' },
+    { name: 'New Criticals', value: payload.change_criticals ,inline:  true },
+    { name: 'Total Criticals', value: payload.total_criticals ,inline:  true }
+	);
+  return message;
 }
